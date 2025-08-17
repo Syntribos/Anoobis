@@ -32,9 +32,9 @@ CREATE TABLE "roles" (
 );
 DROP TABLE IF EXISTS "version";
 CREATE TABLE "version" (
+    "id" INTEGER PRIMARY KEY CHECK (id = 0),
 	"major"	INTEGER NOT NULL,
-	"minor"	INTEGER NOT NULL,
-	PRIMARY KEY("major","minor")
+	"minor"	INTEGER NOT NULL
 );
-INSERT INTO "version" VALUES (0,1);
+INSERT INTO "version" VALUES (0, 0, 1);
 COMMIT;

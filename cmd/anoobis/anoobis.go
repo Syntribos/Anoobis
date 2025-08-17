@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/Syntribos/Anoobis/internal/anoobis_client"
+	"log"
+	"os"
 )
 
 var (
@@ -15,6 +17,7 @@ var (
 func init() { flag.Parse() }
 
 func main() {
+	var err error
 	valid := validateParam("token", BotToken)
 	valid = valid && validateParam("dbpath", DbPath)
 
@@ -23,7 +26,11 @@ func main() {
 		return
 	}
 
-	anoobis_client.Run(BotToken, GuildId, DbPath)
+	if err = anoobis_client.Run(BotToken, GuildId, DbPath); err == nil {
+		os.Exit(0)
+	}
+
+	log.Fatal(err)
 }
 
 func validateParam(name string, value *string) bool {

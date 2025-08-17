@@ -7,33 +7,43 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 )
 
 type AnoobisClient struct {
 }
 
-func Run(botToken *string, guildId *string, dbPath *string) {
+func Run(botToken *string, guildId *string, dbPath *string) error {
+	fmt.Println("Creating bot session...")
 	session, _ := discordgo.New("Bot " + *botToken)
 	session.Identify.Intents |= discordgo.IntentsAllWithoutPrivileged
+	fmt.Println("Session created.")
 
-	db, err := storage.Init(*dbPath)
+	fmt.Println("Initializing database connection...")
 
-	if err != nil {
+	var db *storage.DBInfo
+	var err error
+	if db, err = storage.Init(*dbPath); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("database version: ", db.GetVersionString())
+	fmt.Println("Database connection established. DB version: ", db.GetVersionString())
 
-	err = session.Open()
-	if err != nil {
+	fmt.Println("Connecting to Discord...")
+
+	if err = session.Open(); err != nil {
 		log.Fatalf("Cannot open the session: %v", err)
 	}
+
 	defer func() {
+		fmt.Println("Closing Discord session.")
 		err = session.Close()
 	}()
 
-	stop := make(chan os.Signal, 1)
+	fmt.Println("Discord session established. Press CTRL+C to exit.")
+	stop := make(chan os.Signal, syscall.SIGTERM)
 	signal.Notify(stop, os.Interrupt)
 	<-stop
-	log.Println("Graceful shutdown")
+	log.Println("Shutting down...")
+	return err
 }
