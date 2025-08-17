@@ -113,5 +113,5 @@ func main() {
 	signal.Notify(stop, os.Interrupt)
 	<-stop
 	log.Println("Graceful shutdown")
-
+	log.Println(".")
 }
