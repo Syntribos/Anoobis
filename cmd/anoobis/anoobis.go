@@ -8,25 +8,20 @@ import (
 	"os"
 )
 
-var (
-	BotToken = flag.String("token", "", "Bot authorization token")
-	GuildId  = flag.String("guild", "", "ID of the testing guild")
-	DbPath   = flag.String("dbpath", "", "Full path to the database file")
-)
-
-func init() { flag.Parse() }
+func init() {
+	registerParams()
+	flag.Parse()
+	validateParams()
+}
 
 func main() {
 	var err error
-	valid := validateParam("token", BotToken)
-	valid = valid && validateParam("dbpath", DbPath)
 
-	if !valid {
-		fmt.Println("Please rerun with valid parameters.")
-		return
-	}
+	token := params[tk].value
+	guildId := params[rg].value
+	dbPath := params[db].value
 
-	if err = anoobis_client.Run(BotToken, GuildId, DbPath); err == nil {
+	if err = anoobis_client.Run(token, guildId, dbPath); err == nil {
 		os.Exit(0)
 	}
 
