@@ -3,7 +3,6 @@ package storage
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"log"
 	_ "modernc.org/sqlite"
 	"os"
@@ -15,7 +14,7 @@ func Init(fullPath string) (*DBInfo, error) {
 	version, err = GetVersion(fullPath)
 
 	if errors.Is(err, os.ErrNotExist) {
-		fmt.Println("DB doesn't exist at " + fullPath)
+		log.Println("DB doesn't exist at " + fullPath)
 		version, err = CreateDatabase(fullPath)
 	}
 
@@ -74,7 +73,7 @@ func CreateDatabase(fullPath string) (*DBVersion, error) {
 		return nil, errors.New("CreateDatabase command missing")
 	}
 
-	fmt.Println("Creating database at " + fullPath)
+	log.Println("Creating database at " + fullPath)
 	db, err := sql.Open("sqlite", fullPath)
 	if err != nil {
 		return nil, err
@@ -84,7 +83,11 @@ func CreateDatabase(fullPath string) (*DBVersion, error) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Database created at " + fullPath)
+	log.Println("Database created at " + fullPath)
 
 	return GetVersion(fullPath)
+}
+
+func (*DBInfo) GetCurrentReportCursor(channelId string) (string, error) {
+	return "", nil
 }

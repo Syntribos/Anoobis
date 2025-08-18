@@ -30,6 +30,10 @@ CREATE TABLE "roles" (
 	CONSTRAINT "roles_pk" PRIMARY KEY("internal_id" AUTOINCREMENT),
 	CONSTRAINT "guild_id_fk" FOREIGN KEY("guild_id_fk") REFERENCES "known_guilds"
 );
+CREATE TABLE "historical_reports" (
+    "id" INTEGER PRIMARY KEY CHECK (id = 0),
+    "last_checked_message_id"   INTEGER NOT NULL
+);
 DROP TABLE IF EXISTS "version";
 CREATE TABLE "version" (
     "id" INTEGER PRIMARY KEY CHECK (id = 0),

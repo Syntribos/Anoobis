@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/Syntribos/Anoobis/internal/anoobis_client"
 	"log"
 	"os"
@@ -17,11 +16,7 @@ func init() {
 func main() {
 	var err error
 
-	token := params[tk].value
-	guildId := params[rg].value
-	dbPath := params[db].value
-
-	if err = anoobis_client.Run(token, guildId, dbPath); err == nil {
+	if err = anoobis_client.Run(params[tk].value, params[rg].value, params[rc].value, params[db].value); err == nil {
 		os.Exit(0)
 	}
 
@@ -30,7 +25,7 @@ func main() {
 
 func validateParam(name string, value *string) bool {
 	if value == nil || len(*value) == 0 {
-		fmt.Println("Missing required value for '" + name + "'")
+		log.Println("Missing required value for '" + name + "'")
 		return false
 	}
 	return true

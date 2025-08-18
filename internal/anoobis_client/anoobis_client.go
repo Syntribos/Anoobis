@@ -10,16 +10,21 @@ import (
 	"syscall"
 )
 
-type AnoobisClient struct {
-}
-
-func Run(botToken *string, guildId *string, dbPath *string) error {
-	fmt.Println("Creating bot session...")
+func Run(botToken *string, guildId *string, channelId *string, dbPath *string) error {
+	log.Println("Creating bot session...")
 	session, _ := discordgo.New("Bot " + *botToken)
 	session.Identify.Intents |= discordgo.IntentsAllWithoutPrivileged
-	fmt.Println("Session created.")
+	session.Identify.Intents |= discordgo.PermissionAddReactions
+	session.Identify.Intents |= discordgo.PermissionEmbedLinks
+	session.Identify.Intents |= discordgo.PermissionReadMessageHistory
+	session.Identify.Intents |= discordgo.PermissionSendMessages
 
-	fmt.Println("Initializing database connection...")
+	//Not ok for some reason?
+	//session.Identify.Intents |= discordgo.PermissionAttachFiles
+	//session.Identify.Intents |= discordgo.PermissionSendMessagesInThreads
+	log.Println("Session created.")
+
+	log.Println("Initializing database connection...")
 
 	var db *storage.DBInfo
 	var err error
@@ -27,18 +32,21 @@ func Run(botToken *string, guildId *string, dbPath *string) error {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Database connection established. DB version: ", db.GetVersionString())
+	log.Println("Database connection established. DB version: ", db.GetVersionString())
 
-	fmt.Println("Connecting to Discord...")
+	defer func() {
+		log.Println("Closing Discord session.")
+		err = session.Close()
+	}()
 
+	session.AddHandler(func(session *discordgo.Session, ready *discordgo.Ready) {
+		readHistoricalMessages(db, session, *channelId)
+	})
+
+	log.Println("Connecting to Discord...")
 	if err = session.Open(); err != nil {
 		log.Fatalf("Cannot open the session: %v", err)
 	}
-
-	defer func() {
-		fmt.Println("Closing Discord session.")
-		err = session.Close()
-	}()
 
 	fmt.Println("Discord session established. Press CTRL+C to exit.")
 	stop := make(chan os.Signal, syscall.SIGTERM)
