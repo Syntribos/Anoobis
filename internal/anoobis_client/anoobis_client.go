@@ -2,6 +2,7 @@ package anoobis_client
 
 import (
 	"fmt"
+	m "github.com/Syntribos/Anoobis/internal/models"
 	"github.com/Syntribos/Anoobis/internal/storage"
 	"github.com/bwmarrin/discordgo"
 	"log"
@@ -26,7 +27,7 @@ func Run(botToken *string, guildId *string, channelId *string, dbPath *string) e
 
 	log.Println("Initializing database connection...")
 
-	var db *storage.DBInfo
+	var db *m.DBInfo
 	var err error
 	if db, err = storage.Init(*dbPath); err != nil {
 		log.Fatal(err)
@@ -40,7 +41,7 @@ func Run(botToken *string, guildId *string, channelId *string, dbPath *string) e
 	}()
 
 	session.AddHandler(func(session *discordgo.Session, ready *discordgo.Ready) {
-		readHistoricalMessages(db, session, *channelId)
+		readHistoricalMessages(db, session, *guildId, *channelId)
 	})
 
 	log.Println("Connecting to Discord...")

@@ -2,34 +2,19 @@ package storage
 
 import (
 	_ "embed"
-	"fmt"
+	m "github.com/Syntribos/Anoobis/internal/models"
 )
-
-type DBInfo struct {
-	dataSourceName string
-	version        *DBVersion
-}
-
-type DBVersion struct {
-	major int
-	minor int
-}
 
 const (
 	currentMajor      int    = 0
 	currentMinor      int    = 1
 	getVersionCommand string = "SELECT major, minor FROM version"
+	getReportCursor   string = "SELECT last_checked_message_id FROM historical_reports"
+	saveReportCursor  string = "INSERT INTO historical_reports VALUES (0, ?)"
+	saveReport        string = "INSERT INTO reports (message_id, report_link, user_id, reason) VALUES (?, ?, ?, ?)"
 )
 
-var currentVersion = DBVersion{currentMajor, currentMinor}
+var currentVersion = m.DBVersion{Major: currentMajor, Minor: currentMinor}
 
 //go:embed migrations/anoobis_info.sqlite.sql
 var createCommand string
-
-func (dbVersion *DBVersion) GetVersionString() string {
-	return fmt.Sprintf("%d.%d", dbVersion.major, dbVersion.minor)
-}
-
-func (dbInfo *DBInfo) GetVersionString() string {
-	return dbInfo.version.GetVersionString()
-}

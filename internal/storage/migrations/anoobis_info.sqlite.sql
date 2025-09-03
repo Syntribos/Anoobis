@@ -19,6 +19,7 @@ CREATE TABLE "reports" (
 	"message_id"	INTEGER NOT NULL,
 	"report_link"	TEXT,
 	"user_id"	INTEGER NOT NULL,
+    "reason"    TEXT,
 	CONSTRAINT "reports_pk" PRIMARY KEY("internal_id" AUTOINCREMENT)
 );
 DROP TABLE IF EXISTS "roles";
